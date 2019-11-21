@@ -3,121 +3,6 @@
 #include <stdlib.h>
 # include <cs_demo.h>
 
-/*int min ( int a, int b )
-{
-    if ( a > b ) return b;
-    return a;
-}
-
-int detect ( int *asub,int *xa, int lower_col, int higher_col )
-{
-    int lower_col_ptr = xa[lower_col + 1] - 1;
-    int higher_col_ptr = xa[higher_col + 1] - 1;
-    int lower_col_count = xa[lower_col + 1] - xa[lower_col];
-    int higher_col_count = xa[higher_col + 1] - xa[higher_col];
-    int count = min(lower_col_count, higher_col_count) - 1;
-    int i;
-
-    for ( i = 0; i < count; i++ )
-    {
-        if ( asub[lower_col_ptr] == asub[higher_col_ptr] )
-        {
-            lower_col_ptr--;
-            higher_col_ptr--;
-             continue;
-        }
-        else
-        {
-          break;  
-         }
-    }
-
-    if ( i == count )
-    {*/
-        /* relaxed supernode */
-        /*if ( asub[lower_col_ptr] == lower_col || asub[lower_col_ptr] == higher_col )
-        {
-            if ( asub[higher_col_ptr] == higher_col ) return 1;
-             return 0;
-        }*/
-        /* strict supernode */
-/*        if ( asub[lower_col_ptr] == higher_col && asub[higher_col_ptr] == higher_col ) return 1;
-         return 0;
-    }
-    return 0;
-}
-
-int detect_U ( int *asub,int *xa, int lower_col, int higher_col )
-{
-    in t lower_col_ptr = xa[lower_col];
-    int higher_col_ptr = xa[higher_col];
-    int lower_col_count = xa[lower_col + 1] - xa[lower_col];
-    int higher_col_count = xa[higher_col + 1] - xa[higher_col];
-    int count = min(lower_col_count, higher_col_count) - 1;
-    int i;
-
-    for ( i = 0; i < count; i++ )
-    {
-        if ( asub[lower_col_ptr] == asub[higher_col_ptr] )
-        {
-            lower_col_ptr++;
-            higher_col_ptr++;
-            continue;
-        }
-        else
-        {
-          break;  
-        }
-    }
-
-    if ( i == count )
-    {*/
-        /* relaxed supernode */
-        /*if ( asub[lower_col_ptr] == lower_col || asub[lower_col_ptr] == higher_col )
-        {
-            if ( asub[higher_col_ptr] == higher_col ) return 1;
-            return 0;
-        }*/
-        /* strict supernode */
-//         if ( asub[lower_col_ptr] == lower_col && asub[higher_col_ptr] == lower_col ) return 1;
-/*        if ( asub[lower_col_ptr] == lower_col && asub[higher_col_ptr] == higher_col ) return 1;
-    }
-    return 0;
-}*/
-
-/*int detect_similar_U ( int *asub,int *xa, int lower_col, int higher_col )
-{
-    int lower_col_ptr = xa[lower_col];
-    int higher_col_ptr = xa[higher_col];
-    int lower_col_count = xa[lower_col + 1] - xa[lower_col];
-    int higher_col_count = xa[higher_col + 1] - xa[higher_col];
-//     int count = min(lower_col_count, higher_col_count) - 1;
-    int i;
-
-    if ( lower_col_count == higher_col_count )
-    {
-        if ( lower_col_count <= 4 ) return 0;
-        for ( i = 0; i < lower_col_count-1; i++ )
-        {
-            if ( asub[lower_col_ptr] == asub[higher_col_ptr] )
-            {
-                lower_col_ptr++;
-                higher_col_ptr++;
-                continue;
-            }
-            else
-            {
-                return 0;  
-            }
-        }
-        return 1;
-    }
-    else
-    {
-        return 0;
-    }
-} */
-
 bool equal( double a, double b )
 {
   if ( Abs(a-b) < 0.001  )
@@ -170,16 +55,12 @@ int main( int argc, char *argv[] )
     p_u = ( int * )malloc( sizeof( int ) * n ) ;
     Li = ( int * )malloc( sizeof( int ) * nzl ) ;
     Ui = ( int * )malloc( sizeof( int ) * nzu ) ;
-   // sn_record = ( int * )malloc( sizeof( int ) * n );
-   // sn_record_u = ( int * )malloc( sizeof( int ) * n );
     memset(Lp, 0, sizeof(int)*(n+1));
     memset(Up, 0, sizeof(int)*(n+1));
     memset(p, 0, sizeof(int)*n);
     memset(p_u, 0, sizeof(int)*n);
     memset(Ap, 0, sizeof(int)*(n+1));
     memset(p_a, 0, sizeof(int)*n);
-  //  memset(sn_record, -1, sizeof(int)*n);
-  //  memset(sn_record_u, -1, sizeof(int)*n);
 
     while ( fscanf ( file1, "%d %d %lf\n", &a_i, &a_j, &a_x) == 3 )
     {
@@ -206,12 +87,6 @@ int main( int argc, char *argv[] )
     {
         Lp[i] = Lp[i-1]+p[i-1];
     }
-/*    for ( i = 0; i < n; i++ )
-    {
-        //printf("%d\n", p[i]);
-        if ( p[i] > 8)  sum_l_greater_4++;
-    }
-    printf("row: %d greater4: %d\n", n, sum_l_greater_4);*/
     fclose(file2);
 
     sum = 0;
@@ -242,152 +117,9 @@ int main( int argc, char *argv[] )
         j++; 
     }
     
-    
-    /* similar columns detected in U */
-//     int *similar_u;
-//     similar_u = (int *)malloc( sizeof( int ) * n );
-//     memset(similar_u, 0, sizeof(int)*n);
-//     for ( i = 100; i < n; i++ )
-//     {
-//         if ( similar_u[i] == 0)
-//         {
-//             for ( j = i+1; j < n; j++ )
-//             {
-//                 if ( detect_similar_U(Ui, Up, i, j) )
-//                 {
-//                     similar_u[i]++;
-//                     printf(" i = %d j = %d\n ", i, j);
-//                     similar_u[j] = -1;
-//                 }
-//             }
-//         }
-//         
-//     }
-//     
-//     for ( i = 100; i < n; i++ )
-//     {
-//         if ( similar_u[i] > 0 ) printf("similar_u[%d] = %d\n", i, similar_u[i]);
-//     }
-    
-    
-    
-    
-    
-    
-     /* supernode detect */
-//     int *sn_start = (int *)malloc( sizeof( int ) * n );
-//     int *sn_end = (int *)malloc( sizeof( int ) * n );
-//     memset(sn_start, 0, sizeof(int)*n);
-//     memset(sn_end, 0, sizeof(int)*n);
-//     int sn_sum = 0;
-//     int sn_sum_final = 0;
-// 
-//     int *sn_start_u = (int *)malloc( sizeof( int ) * n );
-//     int *sn_end_u = (int *)malloc( sizeof( int ) * n );
-//     memset(sn_start_u, 0, sizeof(int)*n);
-//     memset(sn_end_u, 0, sizeof(int)*n);
-//     int sn_sum_u = 0;
-//     int sn_sum_final_u = 0;
-//     
-//     for ( i = 0; i < n-1; i++ )
-//     {
-//         if ( p[i] == 1 || p[i+1] == 1 ) continue; 
-//         else
-//         { 
-//              if ( detect(Li, Lp, i, i+1) )
-//             {
-//                  sn_start[sn_sum] = i;
-//                 sn_end[sn_sum] = i + 1;
-//                  sn_sum++;
-//             }
-//         } 
-//     }
-//     for ( i = sn_sum-1; i > 0; i-- )
-//     {
-//         if ( sn_start[i] == sn_end[i-1] )
-//         {
-//             sn_end[i-1] = sn_end[i];
-//             sn_start[i] = 0;
-//              sn_end[i] = 0;
-//         } 
-//     } 
-//     for ( i = 0; i < sn_sum; i++ )
-//     {
-//         if ( sn_end[i] == 0 ) continue;
-//         if ( sn_end[i] - sn_start[i] == 1 ) continue;
-//         else 
-//          {
-//             for ( j = sn_start[i]; j <= sn_end[i]; j++ )
-//             {
-//                 sn_record[j] = sn_sum_final;
-//             }
-//              sn_sum_final++;
-//          }
-//     } 
-//     
-//     for ( i = 0; i < n-1; i++ )
-//     {
-//         if ( p_u[i] == 1 || p_u[i+1] == 1 ) continue; 
-//         else
-//         { 
-//              if ( detect_U(Ui, Up, i, i+1) )
-//             {
-//                  sn_start_u[sn_sum_u] = i;
-//                 sn_end_u[sn_sum_u] = i + 1;
-//                  sn_sum_u++;
-//             }
-//         } 
-//     }
-//     for ( i = sn_sum_u-1; i > 0; i-- )
-//     {
-//         if ( sn_start_u[i] == sn_end_u[i-1] )
-//         {
-//             sn_end_u[i-1] = sn_end_u[i];
-//             sn_start_u[i] = 0;
-//             sn_end_u[i] = 0;
-//         } 
-//     } 
-//     for ( i = 0; i < sn_sum_u; i++ )
-//     {
-//         if ( sn_end_u[i] == 0 ) continue;
-//         //if ( sn_end_u[i] - sn_start_u[i] == 1 ) continue;
-//         else 
-//          {
-//             for ( j = sn_start_u[i]; j <= sn_end_u[i]; j++ )
-//             {
-//                 sn_record_u[j] = sn_sum_final_u;
-//             }
-//              sn_sum_final_u++;
-//          }
-//     } 
-//    
-//     int *index = (int *)malloc( sizeof( int ) * sn_sum_final_u );
-//     memset(index, 0, sizeof(int) * sn_sum_final_u);
-//     for ( i = 0; i < n; i++ )
-//     {
-//         if ( sn_record_u[i] != -1 )
-//         {
-//             index[sn_record_u[i]]++;
-//         }
-//     }
-    
-//     printf("defined number of supernodes of U are: %d\n", sn_sum_final_u);
-// 
      double *l_gp, *l_gp_sn, *x, *l_gp_sn_u;
      double sum_error = 0;
-//     x = ( double * )malloc( sizeof(double) * n);   
-//     
-/*     start_GP_sn = microtime();
-     l_gp_sn = lu_gp_sparse_supernode_computing(Ax, Ai, Ap, n, nzl, nzu, q, pinv, Li, Lp, Ui, Up, sn_record);
-     end_GP_sn = microtime() - start_GP_sn;
-     printf("Time of LU_GP_SN: %lf\n", end_GP_sn);*/
-//     
-//     start_GP_sn_u = microtime();
-//     l_gp_sn_u = lu_gp_sparse_sn_u(Ax, Ai, Ap, n, nzl, nzu, q, pinv, Li, Lp, Ui, Up, sn_record_u, index);
-//     end_GP_sn_u = microtime() - start_GP_sn_u;
-//     printf("Time of LU_GP_SN_UU: %lf\n", end_GP_sn_u);
-//     
-//     
+    
     start_GP = microtime();
     l_gp = lu_gp_sparse(Ax, Ai, Ap, n, nzl, nzu, q, pinv, Li, Lp, Ui, Up);
     end_GP = microtime() - start_GP;
@@ -402,35 +134,10 @@ int main( int argc, char *argv[] )
     {
         if ( !equal ( l_gp[i], l_gp_sn[i] ) ) 
         {
-//            printf("correct[%d] = %lf avx2[%d] = %lf\n", i, l_gp[i], i, l_gp_sn[i]);
             sum_error++;
         }
     }
-// 
-//      /*start = microtime();
-//     lu_gp_sparse_row_computing(Ax, Ai, Ap, n, nzl, nzu, q, pinv, Li, Lp, Ui, Up);
-//      end = microtime() - start;
-//      printf("Time of Row-comouting: %lf\n", end);*/
-//     
-//     for ( i = 0; i < n; i++ )
-//     {
-//         if ( !equal ( l_gp[i], l_gp_sn[i] ) || !equal ( l_gp[i], l_gp_sn_u[i] ) ) 
-//         {
-// //             printf("result[%d] = %lf sn_u_result[%d] = %lf\n", i, l_gp[i], i, l_gp_sn[i]);
-//             sum_error++;
-//         }
-//     }
-//     
     printf("error results are: %lf\n", sum_error);
-//     for ( i = 0; i < n; i++ )
-//     {
-//         x[q[i]] = l_gp[i];
-//     }
-// 
-//     for ( i = 0; i < n; i++ )
-//     {
-//         printf("x[%d] = %lf\n", i, x[i]);
-//     }
     
     return 0;
 }

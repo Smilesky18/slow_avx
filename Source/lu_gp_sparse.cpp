@@ -6,31 +6,14 @@
 # define MICRO_IN_SEC 1000000.00
 
 /* Time Stamp */
-/*double microtime()
+double microtime()
 {
         struct timeval tv;
         struct timezone tz;
         gettimeofday(&tv,&tz);
 
         return tv.tv_sec+tv.tv_usec/MICRO_IN_SEC;
-}*/
-/* a ?= b */
-/*bool equal( double a, double b )
-{
-  if ( Abs(a-b) < 0.001)
-  {
-    return true;
-  }
-  else
-  {
-    return false;
-  }
-}*/
-/* return |x| */
-/*double Abs(double x)
-{
-  return x < 0 ? -x : x;
-}*/
+}
 
 double* lu_gp_sparse(double *a, int *asub, int *xa, int n, int nzl, int nzu, int *perm_c, int *perm_r, int *asub_L, int *xa_L, int *asub_U, int *xa_U)
 {
@@ -48,14 +31,14 @@ double* lu_gp_sparse(double *a, int *asub, int *xa, int n, int nzl, int nzu, int
   /* Array xx initialization*/
   for ( i = 0; i < n; i++ )
   {
-    xx[i] = 0;
+     xx[i] = 0;
     L[xa_L[i]] = 1.0;
   }
 
   /* column-oriented G/P algorithm without partial pivoting */
   for ( k = 0; k < n; k++ )
   {
-    current_column = perm_c[k];
+     current_column = perm_c[k];
     
     /* xx[] = A[:,current_column] */
     for ( j = xa[current_column]; j < xa[current_column+1]; j++ )
