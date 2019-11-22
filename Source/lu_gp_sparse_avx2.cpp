@@ -41,6 +41,7 @@ double* lu_gp_sparse_avx2(double *a, int *asub, int *xa, int n, int nzl, int nzu
   
 
   v2df_t v_l, v_row, v_mul, v_sub, v;
+  v2df_t permute_var;
   v2if_t vi;
   int column_divid, m;
   double temp;
@@ -72,12 +73,15 @@ double* lu_gp_sparse_avx2(double *a, int *asub, int *xa, int n, int nzl, int nzu
         v_row.ptr_vec[2] = xx[row];
         v_row.ptr_vec[3] = xx[row];*/
         v_row.vec = _mm256_set1_pd(xx[row]);
+
+#pragma unroll(4) 
         for ( i = xa_L[row]+1; i < xa_L[row]+1+column_divid*4; i+=4 )
         {
-       /*     v_l.ptr_vec[0] = L[i];
+/*            v_l.ptr_vec[0] = L[i];
             v_l.ptr_vec[1] = L[i+1];
             v_l.ptr_vec[2] = L[i+2];
-            v_l.ptr_vec[3] = L[i+3]; */
+            v_l.ptr_vec[3] = L[i+3]; 
+*/
             v_l.vec = _mm256_loadu_pd(&L[i]);
             
      //       v_l.vec = _mm256_set1_pd(1);
@@ -85,35 +89,55 @@ double* lu_gp_sparse_avx2(double *a, int *asub, int *xa, int n, int nzl, int nzu
 /*            vi.ptr_vec[0] = asub_L[i];
             vi.ptr_vec[1] = asub_L[i+1];
             vi.ptr_vec[2] = asub_L[i+2];
-            vi.ptr_vec[3] = asub_L[i+3]; */
+            vi.ptr_vec[3] = asub_L[i+3]; 
+*/			
             vi.vec = _mm_loadu_si128((__m128i const *)&asub_L[i]);
-
-/*            v.ptr_vec[0] = xx[vi.ptr_vec[0]];
+/*
+            v.ptr_vec[0] = xx[vi.ptr_vec[0]];
             v.ptr_vec[1] = xx[vi.ptr_vec[1]];
             v.ptr_vec[2] = xx[vi.ptr_vec[2]];
-            v.ptr_vec[3] = xx[vi.ptr_vec[3]]; */
+            v.ptr_vec[3] = xx[vi.ptr_vec[3]]; 
+*/			
             v.vec = _mm256_i32gather_pd(&xx[0], vi.vec, 8);
-
-/*            v_mul.ptr_vec[0] = v_l.ptr_vec[0] * v_row.ptr_vec[0];
+/*
+            v_mul.ptr_vec[0] = v_l.ptr_vec[0] * v_row.ptr_vec[0];
             v_mul.ptr_vec[1] = v_l.ptr_vec[1] * v_row.ptr_vec[1];
             v_mul.ptr_vec[2] = v_l.ptr_vec[2] * v_row.ptr_vec[2];
-            v_mul.ptr_vec[3] = v_l.ptr_vec[3] * v_row.ptr_vec[3]; */
-  //          v_mul.vec = _mm256_mul_pd(v_l.vec, v_row.vec);
-
-  /*          v_sub.ptr_vec[0] = v.ptr_vec[0] - v_mul.ptr_vec[0];
+            v_mul.ptr_vec[3] = v_l.ptr_vec[3] * v_row.ptr_vec[3]; 
+*/			
+//            v_mul.vec = _mm256_mul_pd(v_l.vec, v_row.vec);
+/*
+            v_sub.ptr_vec[0] = v.ptr_vec[0] - v_mul.ptr_vec[0];
             v_sub.ptr_vec[1] = v.ptr_vec[1] - v_mul.ptr_vec[1];
             v_sub.ptr_vec[2] = v.ptr_vec[2] - v_mul.ptr_vec[2];
-            v_sub.ptr_vec[3] = v.ptr_vec[3] - v_mul.ptr_vec[3]; */
-    //        v_sub.vec = _mm256_sub_pd(v.vec, v_mul.vec); 
+            v_sub.ptr_vec[3] = v.ptr_vec[3] - v_mul.ptr_vec[3]; 
+*/			
+//            v_sub.vec = _mm256_sub_pd(v.vec, v_mul.vec); 
+			
             v_sub.vec = _mm256_fnmadd_pd(v_l.vec, v_row.vec, v.vec);
 
+            xx[asub_L[i]] = _mm256_cvtsd_f64(v_sub.vec);
+
+			permute_var.vec = _mm256_permute_pd(v_sub.vec, 11);
+            xx[asub_L[i+1]] = _mm256_cvtsd_f64(permute_var.vec);
+
+			permute_var.vec = _mm256_permute4x64_pd(permute_var.vec, 14);
+            xx[asub_L[i+2]] = _mm256_cvtsd_f64(permute_var.vec);
+
+			permute_var.vec = _mm256_permute_pd(permute_var.vec, 11);
+            xx[asub_L[i+3]] = _mm256_cvtsd_f64(permute_var.vec);
+
+
+
+
          //   v_sub.vec = v.vec;
-            _mm256_store_pd(&xx[asub_L[i]], v_sub.vec);
-        /*    xx[asub_L[i]] = v_sub.ptr_vec[0];
+        //    _mm256_store_pd(&xx[asub_L[i]], v_sub.vec);
+/*		    
+            xx[asub_L[i]] = v_sub.ptr_vec[0];
             xx[asub_L[i+1]] = v_sub.ptr_vec[1];
             xx[asub_L[i+2]] = v_sub.ptr_vec[2];
-            xx[asub_L[i+3]] = v_sub.ptr_vec[3]; */
-
+            xx[asub_L[i+3]] = v_sub.ptr_vec[3]; 
+*/
         }
         for ( m = xa_L[row]+1+column_divid*4; m < xa_L[row+1]; m++ )
         {
